@@ -2,8 +2,9 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 
-corpus = ['you are kim',
-          'you are a developer']
+corpus = ['I am a software developer',
+          'I am a programmer',
+          'I am a software engineer']
 print('\n' + 'original corpus:\n' + str(corpus) + '\n')
 
 
@@ -95,9 +96,9 @@ b1 = tf.Variable(tf.random_normal([1]))  # bias
 hidden_layer = tf.add(tf.matmul(x_input, w1), b1)
 
 # output layer
-W2 = tf.Variable(tf.random_normal([EMBEDDING_DIM, ONE_HOT_DIMENSION]))
+w2 = tf.Variable(tf.random_normal([EMBEDDING_DIM, ONE_HOT_DIMENSION]))
 b2 = tf.Variable(tf.random_normal([1]))
-prediction = tf.nn.softmax(tf.add(tf.matmul(hidden_layer, W2), b2))
+prediction = tf.nn.softmax(tf.add(tf.matmul(hidden_layer, w2), b2))
 
 # loss function: cross entropy
 loss = tf.reduce_mean(-tf.reduce_sum(y_label * tf.log(prediction), axis=[1]))
@@ -126,3 +127,29 @@ w2v_df = pd.DataFrame(vectors, columns=['x1', 'x2'])
 w2v_df['word'] = words
 w2v_df = w2v_df[['word', 'x1', 'x2']]
 print('\n' + str(w2v_df))
+
+
+# for idx, x in enumerate(X_train):
+#     print(str(x))
+#     dot_product = np.dot(x, Y_train[idx])
+#     print("Dot product for line " + str(idx) + ": " + str(dot_product))
+
+
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots()
+
+for word, x1, x2 in zip(w2v_df['word'], w2v_df['x1'], w2v_df['x2']):
+    ax.annotate(word, (x1, x2))
+
+PADDING = 1.0
+x_axis_min = np.amin(vectors, axis=0)[0] - PADDING
+y_axis_min = np.amin(vectors, axis=0)[1] - PADDING
+x_axis_max = np.amax(vectors, axis=0)[0] + PADDING
+y_axis_max = np.amax(vectors, axis=0)[1] + PADDING
+
+plt.xlim(x_axis_min, x_axis_max)
+plt.ylim(y_axis_min, y_axis_max)
+plt.rcParams["figure.figsize"] = (10, 10)
+
+plt.show()
