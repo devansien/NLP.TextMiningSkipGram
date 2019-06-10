@@ -90,9 +90,9 @@ y_label = tf.placeholder(tf.float32, shape=(None, ONE_HOT_DIMENSION))
 EMBEDDING_DIM = 2
 
 # hidden layer: which represents word vector eventually
-W1 = tf.Variable(tf.random_normal([ONE_HOT_DIMENSION, EMBEDDING_DIM]))
+w1 = tf.Variable(tf.random_normal([ONE_HOT_DIMENSION, EMBEDDING_DIM]))
 b1 = tf.Variable(tf.random_normal([1]))  # bias
-hidden_layer = tf.add(tf.matmul(x_input, W1), b1)
+hidden_layer = tf.add(tf.matmul(x_input, w1), b1)
 
 # output layer
 W2 = tf.Variable(tf.random_normal([EMBEDDING_DIM, ONE_HOT_DIMENSION]))
@@ -105,25 +105,24 @@ loss = tf.reduce_mean(-tf.reduce_sum(y_label * tf.log(prediction), axis=[1]))
 # training operation
 train_op = tf.train.GradientDescentOptimizer(0.05).minimize(loss)
 
-# Train the NN
+# train the NN
 sess = tf.Session()
 init = tf.global_variables_initializer()
 sess.run(init)
 
 iteration = 5000
 for i in range(iteration):
-    # input is X_train which is one hot encoded word
-    # label is Y_train which is one hot encoded neighbor word
+    # input is x_train which is one hot encoded word
+    # label is y_train which is one hot encoded neighbor word
     sess.run(train_op, feed_dict={x_input: x_train, y_label: y_train})
     if i % 3000 == 0:
-        print('iteration ' + str(i) + ' loss is : ', sess.run(loss, feed_dict={x_input: x_train, y_label: y_train}))
+        print('\niteration ' + str(i) + ' loss is : ', sess.run(loss, feed_dict={x_input: x_train, y_label: y_train}))
 
-# Now the hidden layer (W1 + b1) is actually the word look up table
-vectors = sess.run(W1 + b1)
-# print(vectors)
+# now the hidden layer (w1 + b1) is actually the word look up table
+vectors = sess.run(w1 + b1)
 
-# Print the word vector in a table
+# print the word vector in a table
 w2v_df = pd.DataFrame(vectors, columns=['x1', 'x2'])
 w2v_df['word'] = words
 w2v_df = w2v_df[['word', 'x1', 'x2']]
-print(w2v_df)
+print('\n' + str(w2v_df))
