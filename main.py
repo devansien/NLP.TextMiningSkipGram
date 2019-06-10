@@ -1,10 +1,16 @@
+import json
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+import matplotlib.pyplot as plt
 
 corpus = ['I am a software developer',
           'I am a programmer',
           'I am a software engineer']
+
+# with open('Firearms.txt', 'r') as file:
+#     corpus = file.read().split('\n')
+
 print('\n' + 'original corpus:\n' + str(corpus) + '\n')
 
 
@@ -128,18 +134,19 @@ w2v_df['word'] = words
 w2v_df = w2v_df[['word', 'x1', 'x2']]
 print('\n' + str(w2v_df))
 
-
-# for idx, x in enumerate(X_train):
-#     print(str(x))
-#     dot_product = np.dot(x, Y_train[idx])
-#     print("Dot product for line " + str(idx) + ": " + str(dot_product))
-
-
-import matplotlib.pyplot as plt
-
+# chart & jsonify
 fig, ax = plt.subplots()
 
+word_list = {'words': []}
+
 for word, x1, x2 in zip(w2v_df['word'], w2v_df['x1'], w2v_df['x2']):
+    word_list['words'].append(
+        {
+            'word': word,
+            'x1': x1,
+            'x2': x2
+        }
+    )
     ax.annotate(word, (x1, x2))
 
 PADDING = 1.0
@@ -151,5 +158,22 @@ y_axis_max = np.amax(vectors, axis=0)[1] + PADDING
 plt.xlim(x_axis_min, x_axis_max)
 plt.ylim(y_axis_min, y_axis_max)
 plt.rcParams["figure.figsize"] = (10, 10)
+
+# plt.show()
+print('\n')
+
+# dot product
+for word_json in word_list['words']:
+    i = word_list['words'].index(word_json)
+    source_word = word_json
+    # print('source word:\n' + source_word)
+    while i < len(word_list['words']):
+        target_word = word_list['words'][i]
+        if source_word['word'] != target_word['word']:
+            dot_product = np.dot([source_word['x1'], source_word['x2']], [target_word['x1'], target_word['x2']])
+            print('[Word A]: ' + str(source_word['word']) + ' [Word B]: ' + str(
+                target_word['word']) + ' [Dist.]: ' + str(dot_product))
+        i += 1
+    print('\n')
 
 plt.show()
